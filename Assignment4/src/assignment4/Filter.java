@@ -47,14 +47,12 @@ public class Filter {
      * @return all and only the tweets in the list that were sent during the timespan,
      *         in the same order as in the input list.
      */
-    public static List<Tweets> inTimespan(List<Tweets> tweets, Timespan timespan) {
+    public static List<Tweets> inTimespan(List<Tweets> tweets, Timespan timespan){
         List<Tweets> filteredList = new ArrayList<Tweets>();
-        System.out.println(timespan.getStart());
-        System.out.println(timespan.getEnd());
         //check if tweet falls in timespan
         for(Tweets tweet:tweets){
             Instant instant = Instant.parse(tweet.getDate());
-            if((timespan.getStart().isBefore(instant))&&(timespan.getEnd().isAfter(instant))){
+            if(((timespan.getStart().isBefore(instant))||(timespan.getStart().equals(instant)))&&((timespan.getEnd().isAfter(instant))||(timespan.getStart().equals(instant)))){
                 filteredList.add(tweet);
             }
         }

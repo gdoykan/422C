@@ -48,17 +48,56 @@ public class SocialNetwork {
             }
 
         }
+
+        //sort all users based on followers
         ArrayList<User> sortedUsers = new ArrayList<>();
         for(String key: followers.keySet()){
             User user = new User(key, followers.get(key));
             sortedUsers.add(user);
         }
         Collections.sort(sortedUsers, (user1, user2) -> user2.getFollowers()-user1.getFollowers());
-        for(int i = 0;i<k;i++){
-            mostFollowers.add(sortedUsers.get(i).getUsername());
+
+        //put k mostfollowed user into arraylist
+        if(k>sortedUsers.size()){
+            for(int i = 0;i<sortedUsers.size();i++){
+                mostFollowers.add(sortedUsers.get(i).getUsername());
+            }
+        }else{
+            for(int i = 0;i<k;i++){
+                mostFollowers.add(sortedUsers.get(i).getUsername());
+            }
         }
+
         System.out.println(mostFollowers);
         return mostFollowers;
+    }
+
+    public static HashMap<String, HashSet> userMentions(List<Tweets> tweets){
+        HashMap<String, HashSet> users = new HashMap<>();
+
+
+        for(Tweets tweet: tweets) {
+            if (!users.containsKey(tweet.getName().toLowerCase())) { //new user
+                HashSet<String> val = new HashSet<>();
+                users.put(tweet.getName().toLowerCase(), val);
+
+                String[] words = tweet.getText().split(" ");
+                for (String word : words) {
+                    if (word.matches("(?<![A-Za-z0-9_])[@]([A-Za-z0-9_]+)")) {
+                        val.add(word.replace("@", "").toLowerCase());
+                    }
+                }
+            }else{
+                String[] words = tweet.getText().split(" ");
+                for (String word : words) {
+                    if (word.matches("(?<![A-Za-z0-9_])[@]([A-Za-z0-9_]+)")) {
+                        users.get(tweet.getName().toLowerCase()).add(word.replace("@", "").toLowerCase());
+                    }
+                }
+            }
+        }
+
+        return users;
     }
 
     /**
@@ -69,8 +108,53 @@ public class SocialNetwork {
      *
      * @return list of set of all cliques in the graph
      */
-    List<Set<String>> findCliques(List<Tweets> tweets) {
+    public static List<Set<String>> findCliques(List<Tweets> tweets) {
         List<Set<String>> result = new ArrayList<Set<String>>();
+        HashMap<String, HashSet> usersMap = userMentions(tweets);
+
+        for(String k: usersMap.keySet()){
+            //iterate through every person mentioned by this user
+            boolean flag = false;
+            boolean duplicate = false;
+            HashSet<String> clique = new HashSet<>();
+            for(Object mentionedUser: usersMap.get(k)){
+                if(mentionedUser.toString().equals(k)){ //if user mentions himself
+                    continue;
+                }
+                if(!usersMap.containsKey(mentionedUser.toString())){ //if mentioned user has never tweeted before
+                    continue;
+                }
+                for(Object j: usersMap.get(mentionedUser.toString())){
+                    //System.out.println(j);
+                    //if mutually mentioned add to clique
+                    if(j.toString().toLowerCase().equals(k.toLowerCase())){
+                        if(!flag){
+                            clique.add(k);
+                            clique.add(mentionedUser.toString());
+                            flag = true;
+                        }else{
+                            clique.add(mentionedUser.toString());
+                        }
+                        break;
+                    }
+                }
+            }
+            //check if clique was formed
+            if(flag) {
+                //check if this clique already exists
+                for(Object m: result){
+                    if(clique.equals(m)){
+                        duplicate = true;
+                        break;
+                    }
+                }
+                if(!duplicate){
+                    result.add(clique);
+                    System.out.println(clique);
+                }
+            }
+        }
+        //System.out.println(result);
         return result;
     }
 }

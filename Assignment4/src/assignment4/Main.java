@@ -1,6 +1,7 @@
 package assignment4;
 
 import java.util.List;
+import java.util.Set;
 
 public class Main {
     final static String URLEndpoint = "http://kevinstwitterclient2.azurewebsites.net/api/products";
@@ -11,13 +12,13 @@ public class Main {
      * Here is an example of how you might test the code from main
      * for Problem 1 and Problem 2
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception{
 
         // Problem 1: Returning Tweets from Server
         TweetReader reader = new TweetReader();
         List<Tweets> tweetsList = reader.readTweetsFromWeb(URLEndpoint);
         System.out.println(tweetsList);
-
+//
 //        // Problem 2:
 //        // Filter Tweets by Username
 //        Filter filter = new Filter();
@@ -36,7 +37,10 @@ public class Main {
 //        System.out.println(filteredWords);
 
         //test for k most followers
-        SocialNetwork.findKMostFollower(tweetsList, 3);
+        SocialNetwork.findKMostFollower(tweetsList, 5);
         System.out.println();
+
+        //test for finding cliques
+        List<Set<String>> test = SocialNetwork.findCliques(tweetsList);
     }
 }
