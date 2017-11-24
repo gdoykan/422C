@@ -1,6 +1,8 @@
 package assignment4;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Social Network consists of methods that filter users matching a
@@ -11,6 +13,7 @@ import java.util.*;
  * private methods or classes if you like.
  */
 public class SocialNetwork {
+    public static final String regex = "(?<![A-Za-z0-9_])[@]([A-Za-z0-9_]+)";
 
     /**
      * Get K most followed Users.
@@ -33,16 +36,19 @@ public class SocialNetwork {
         List<String> mostFollowers = new ArrayList<>();
         HashMap<String, Integer> followers = new HashMap<>();
 
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(tweets.get(0).getText());
+
         //record mentions for all users
         for(Tweets tweet: tweets){
-            String[] words = tweet.getText().split(" ");
-            for(String word: words){
-                if(word.matches("(?<![A-Za-z0-9_])[@]([A-Za-z0-9_]+)")){
-                    if(!followers.containsKey(word)) {
-                        followers.put(word,1);
+            matcher = pattern.matcher((tweet.getText()));
+            while(matcher.find()){
+                for(int i = 0; i< matcher.groupCount();i++){
+                    if(!followers.containsKey(matcher.group(i).toLowerCase())) {
+                        followers.put(matcher.group(i).toLowerCase(),1);
                     }
                     else {
-                        followers.put(word, followers.get(word)+1);
+                        followers.put(matcher.group(i).toLowerCase(), followers.get(matcher.group(i).toLowerCase())+1);
                     }
                 }
             }
@@ -64,7 +70,7 @@ public class SocialNetwork {
             }
         }else{
             for(int i = 0;i<k;i++){
-                mostFollowers.add(sortedUsers.get(i).getUsername());
+                mostFollowers.add(sortedUsers.get(i).getUsername().replace("@", ""));
             }
         }
 
@@ -74,24 +80,25 @@ public class SocialNetwork {
 
     public static HashMap<String, HashSet> userMentions(List<Tweets> tweets){
         HashMap<String, HashSet> users = new HashMap<>();
-
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(tweets.get(0).getText());
 
         for(Tweets tweet: tweets) {
+            matcher = pattern.matcher((tweet.getText()));
+
             if (!users.containsKey(tweet.getName().toLowerCase())) { //new user
                 HashSet<String> val = new HashSet<>();
                 users.put(tweet.getName().toLowerCase(), val);
 
-                String[] words = tweet.getText().split(" ");
-                for (String word : words) {
-                    if (word.matches("(?<![A-Za-z0-9_])[@]([A-Za-z0-9_]+)")) {
-                        val.add(word.replace("@", "").toLowerCase());
+                while(matcher.find()){ //add mentions to hashset
+                    for(int i = 0; i< matcher.groupCount();i++){
+                        val.add(matcher.group(i).replace("@", "").toLowerCase());
                     }
                 }
-            }else{
-                String[] words = tweet.getText().split(" ");
-                for (String word : words) {
-                    if (word.matches("(?<![A-Za-z0-9_])[@]([A-Za-z0-9_]+)")) {
-                        users.get(tweet.getName().toLowerCase()).add(word.replace("@", "").toLowerCase());
+            }else{ //existing user, add users he mentions
+                while(matcher.find()){
+                    for(int i = 0; i< matcher.groupCount();i++){
+                        users.get(tweet.getName().toLowerCase()).add((matcher.group(i)).replace("@", "").toLowerCase());
                     }
                 }
             }
@@ -150,7 +157,7 @@ public class SocialNetwork {
                 }
                 if(!duplicate){
                     result.add(clique);
-                    System.out.println(clique);
+                    //System.out.println(clique);
                 }
             }
         }

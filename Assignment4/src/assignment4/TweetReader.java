@@ -36,9 +36,6 @@ public class TweetReader {
         //GET request
         con.setRequestMethod("GET");
         //checking response code
-//        int responseCode = con.getResponseCode();
-//        System.out.println("\nSending 'GET' request to URL : " + url);
-//        System.out.println("Response Code : " + responseCode);
 
         //getting data from website
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
