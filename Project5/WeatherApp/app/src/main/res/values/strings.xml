@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <string name="title_activity_current_conditions">currentConditions</string>
+    <string name="title_activity_two_day_avg">TwoDayAvg</string>
+    <string name="title_activity_hourly">Hourly</string>
+    <string name="title_activity_upcoming_week">UpcomingWeek</string>
+    <string name="title_activity_time_machine">TimeMachine</string>
+    <string name="title_activity_past_forecast">PastForecast</string>
+</resources>
